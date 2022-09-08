@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import java.util.ResourceBundle;
+
 public class SecondActivity extends AppCompatActivity {
     private EditText pages;
     private EditText description;

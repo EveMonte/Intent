@@ -2,13 +2,20 @@ package by.bstu.fit.savelev.intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,23 +82,29 @@ public class LastActivity extends AppCompatActivity {
     }
 
     public void serialize(View v){
-        try{
-        JSONObject bookJSON = new JSONObject();
+        try {
+            JSONObject bookJSON = new JSONObject();
+            File path = getApplicationContext().getFilesDir();
+            Toast filePath = Toast.makeText(getApplicationContext(), (CharSequence) path, Toast.LENGTH_LONG);
+            filePath.show();
+            FileOutputStream writer = new FileOutputStream(new File(path, "bookInfo.json"));
+            bookJSON.put("title", book.getTitle());
+            bookJSON.put("author", book.getAuthor());
+            bookJSON.put("genre", book.getGenre());
+            bookJSON.put("description", book.getDescription());
+            bookJSON.put("pages", book.getPages());
+            bookJSON.put("price", book.getPrice());
+            bookJSON.put("year", book.getYear());
+            bookJSON.put("audible", book.isAudible());
 
-        bookJSON.put("title", book.getTitle());
-        bookJSON.put("author", book.getAuthor());
-        bookJSON.put("genre", book.getGenre());
-        bookJSON.put("description", book.getDescription());
-        bookJSON.put("pages", book.getPages());
-        bookJSON.put("price", book.getPrice());
-        bookJSON.put("year", book.getYear());
-        bookJSON.put("audible", book.isAudible());
-
-        String bookString = bookJSON.toString();
-        json.setText(bookString);
+            String bookString = bookJSON.toString();
+            writer.write(bookString.getBytes(StandardCharsets.UTF_8));
+            writer.close();
+            //json.setText(bookString);
         }
         catch (Exception ex){
             ex.getMessage();
+            Log.d("Error", ex.getMessage());
         }
     }
 }

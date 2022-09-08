@@ -47,10 +47,10 @@ public class MainActivity extends AppCompatActivity {
     public void setDate(View v) {
         Button button = (Button) v;
         switch(v.getId()){
-            case R.id.timeButton:
+            case R.id.dateButton:
                 activeDateTime = currentDateTime;
                 break;
-            case R.id.timeButton2:
+            case R.id.dateButton2:
                 activeDateTime = currentDateTime2;
                 break;
         }
