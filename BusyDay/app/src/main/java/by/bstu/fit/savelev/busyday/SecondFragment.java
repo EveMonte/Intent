@@ -1,0 +1,216 @@
+package by.bstu.fit.savelev.busyday;
+
+import static android.app.Activity.RESULT_OK;
+
+import static by.bstu.fit.savelev.busyday.utils.JsonUtil.SerializeDataToJson;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.OpenableColumns;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
+import android.widget.Toast;
+
+import by.bstu.fit.savelev.busyday.models.*;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import by.bstu.fit.savelev.busyday.databinding.FragmentSecondBinding;
+
+public class SecondFragment extends Fragment {
+
+    private FragmentSecondBinding binding;
+    private Item newActivity;
+    private ArrayList<Item> items;
+    OutputStream outStream = null;
+    @Override
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState
+    ) {
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            Item receivedCar = bundle.getParcelable("CurrentItem"); // Key
+        }
+        binding = FragmentSecondBinding.inflate(inflater, container, false);
+        items = ((Storage) getContext().getApplicationContext()).getItems();
+
+        binding.BSelectImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageChooser();
+            }
+        });
+        binding.BSaveItem.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        PopupMenu popup = new PopupMenu(v.getContext(),v);
+                        popup.inflate(R.menu.popup_menu);
+                        popup.show();
+                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem menuItem) {
+                                // Toast message on menu item clicked
+                                switch (menuItem.getItemId()) {
+                                    case R.id.BSaveItem:
+                                        saveItem();
+                                        return true;
+                                    case R.id.BCancel:
+                                        return true;
+                                }
+
+                                return true;
+                            }
+                        });
+                    }
+                });
+
+        return binding.getRoot();
+
+    }
+
+    private void saveItem() {
+        Item item = new Item();
+        item.setPhoto("");
+        item.setActivityCategory((String)binding.activityCategory.getSelectedItem());
+        item.setDurationInMinutes(Integer.parseInt(binding.activityDuration.getText().toString()));
+        item.setActivityName(binding.activityName.getText().toString());
+        items.add(item);
+        ((Storage) getContext().getApplicationContext()).setItems(items);
+        SerializeDataToJson(getContext());
+    }
+
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ArrayList<String> ct = new ArrayList<String>();
+        newActivity = new Item();
+        int i = 0;
+        ActivityCategories[] possibleValues = ActivityCategories.values();
+        for (ActivityCategories cat:
+                possibleValues
+        ) {
+            ct.add(cat.getValue());
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter(getContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                ct.toArray());
+        // Определяем разметку для использования при выборе элемента
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Применяем адаптер к элементу spinner
+        binding.activityCategory.setAdapter(adapter);
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+
+
+    void imageChooser() {
+
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"),1);
+    }
+
+    // this function is triggered when user
+    // selects the image from the imageChooser
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            if (resultCode == RESULT_OK) {
+                if (requestCode == 1) {
+                    Uri selectedImageUri = data.getData();
+                    String str = getRealPathFromURI(selectedImageUri);
+                    // Get the path from the Uri
+                    // Set the image in ImageView
+                    binding.activityImage.setImageURI(selectedImageUri);
+                    saveToFiles();
+
+                }
+            }
+        } catch (Exception e) {
+            Log.e("FileSelectorActivity", "File select error", e);
+        }
+    }
+    @SuppressLint("Range")
+    public String getRealPathFromURI(Uri contentUri) {
+// can post image
+        String res = null;
+        if (contentUri.getScheme().equals("content")) {
+            Cursor cursor = getContext().getContentResolver().query(contentUri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    res = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+            if (res == null) {
+                res = contentUri.getPath();
+                int cutt = res.lastIndexOf('/');
+                if (cutt != -1) {
+                    res = res.substring(cutt + 1);
+                }
+            }
+        }
+        return res;
+
+    }
+
+    public void saveToFiles(){
+        // Write to SD Card
+        try {
+            BitmapDrawable drawable = (BitmapDrawable) binding.activityImage.getDrawable();
+            Bitmap bitmap = drawable.getBitmap();
+            File sdCard = Environment.getExternalStorageDirectory();
+            File dir = new File(sdCard.getAbsolutePath() + "/camtest");
+            dir.mkdirs();
+
+            String fileName = String.format("%d.jpg", System.currentTimeMillis());
+            File outFile = new File(dir, fileName);
+
+            outStream = new FileOutputStream(outFile);
+            boolean d = bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outStream);
+            outStream.flush();
+            outStream.close();
+            newActivity.setPhoto(outFile.getAbsolutePath());
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+
+        }
+    }
+
+}
