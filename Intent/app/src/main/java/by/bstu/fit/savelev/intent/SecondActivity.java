@@ -75,7 +75,7 @@ public class SecondActivity extends AppCompatActivity {
         Intent switchActivityIntent;
         switch (direction) {
             case 0:
-                switchActivityIntent = new Intent(this, LastActivity.class);
+                switchActivityIntent = new Intent(this, ContactActivity.class);
                 break;
             case 1:
                 switchActivityIntent = new Intent(this, MainActivity.class);

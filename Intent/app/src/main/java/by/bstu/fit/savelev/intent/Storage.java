@@ -2,16 +2,17 @@ package by.bstu.fit.savelev.intent;
 
 import android.app.Application;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Storage extends Application {
-    List<Book> bookstore;
+    ArrayList<Book> bookstore;
 
-    public List<Book> getBookstore() {
+    public ArrayList<Book> getBookstore() {
         return bookstore;
     }
 
-    public void setBookstore(List<Book> bookstore) {
+    public void setBookstore(ArrayList<Book> bookstore) {
         this.bookstore = bookstore;
     }
 }

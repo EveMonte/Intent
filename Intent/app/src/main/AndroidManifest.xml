@@ -2,10 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="by.bstu.fit.savelev.intent">
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
 
     <application
-        android:allowBackup="true"
         android:name=".Storage"
+        android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/book"
@@ -15,10 +17,16 @@
         android:theme="@style/Theme.Intent"
         tools:targetApi="31">
         <activity
+            android:name=".BookInfo"
+            android:exported="false" />
+        <activity
             android:name=".LastActivity"
             android:exported="false" />
         <activity
             android:name=".SecondActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ContactActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
@@ -27,6 +35,9 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.media.action.STILL_IMAGE_CAMERA"
+                    />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
     </application>

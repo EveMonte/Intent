@@ -82,6 +82,21 @@
         app:layout_constraintRight_toRightOf="@id/editText_bookYear"
         app:layout_constraintTop_toBottomOf="@id/editText_bookYear"/>
     <Button
+        android:id="@+id/lastActivity"
+        android:layout_width="wrap_content"
+        android:text="list"
+        android:backgroundTint="@color/button_background"
+        android:textColor="@color/white"
+        android:layout_marginTop="25dp"
+        android:onClick="switchToTheList"
+
+        app:layout_constraintTop_toBottomOf="@id/audible"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/button_first"
+
+        android:layout_height="wrap_content" />
+
+    <Button
         android:id="@+id/button_first"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
@@ -91,37 +106,9 @@
         android:layout_marginTop="25dp"
         android:onClick="switchToTheSecond"
         app:layout_constraintTop_toBottomOf="@id/audible"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/lastActivity"
         app:layout_constraintRight_toRightOf="parent"
         />
 
-    <CheckBox
-        android:id="@+id/secondCheck"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checked="false"
-        android:clickable="false"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
-    <CheckBox
-        android:id="@+id/firstCheck"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checked="true"
-        android:clickable="false"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/secondCheck" />
-    <CheckBox
-        android:id="@+id/thirdCheck"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="false"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/secondCheck"
-        android:checked="false"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
