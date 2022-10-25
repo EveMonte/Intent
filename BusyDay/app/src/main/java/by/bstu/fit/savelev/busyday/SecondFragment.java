@@ -45,6 +45,9 @@ public class SecondFragment extends Fragment {
     private FragmentSecondBinding binding;
     private Item newActivity;
     private ArrayList<Item> items;
+    private  String imgPath;
+    private int receivedItem = -1;
+    private DialogSave dlg;
     OutputStream outStream = null;
     @Override
     public View onCreateView(
@@ -53,10 +56,16 @@ public class SecondFragment extends Fragment {
     ) {
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            Item receivedCar = bundle.getParcelable("CurrentItem"); // Key
+            receivedItem = bundle.getInt("CurrentItem"); // Key
+
         }
         binding = FragmentSecondBinding.inflate(inflater, container, false);
-        items = ((Storage) getContext().getApplicationContext()).getItems();
+        dlg = new DialogSave();
+        if(((Storage) getContext().getApplicationContext()).getItems() != null){
+            items = ((Storage) getContext().getApplicationContext()).getItems();
+        }
+        else
+            items = new ArrayList<Item>();
 
         binding.BSelectImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +85,7 @@ public class SecondFragment extends Fragment {
                             public boolean onMenuItemClick(MenuItem menuItem) {
                                 // Toast message on menu item clicked
                                 switch (menuItem.getItemId()) {
-                                    case R.id.BSaveItem:
+                                    case R.id.BConfirm:
                                         saveItem();
                                         return true;
                                     case R.id.BCancel:
@@ -89,19 +98,36 @@ public class SecondFragment extends Fragment {
                     }
                 });
 
+
         return binding.getRoot();
 
     }
 
-    private void saveItem() {
+
+    public void saveItem(){
+
         Item item = new Item();
-        item.setPhoto("");
+        item.setActivityDescription(binding.activityDescription.getText().toString());
         item.setActivityCategory((String)binding.activityCategory.getSelectedItem());
+        item.setPhoto(imgPath);
         item.setDurationInMinutes(Integer.parseInt(binding.activityDuration.getText().toString()));
         item.setActivityName(binding.activityName.getText().toString());
-        items.add(item);
+
+
+        if(receivedItem != -1){
+            items.set(receivedItem, item);
+        }
+        else items.add(item);
+
         ((Storage) getContext().getApplicationContext()).setItems(items);
         SerializeDataToJson(getContext());
+        FirstFragment fragment = new FirstFragment();
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.nav_host_fragment_content_main, fragment)
+                .addToBackStack(null)
+                .commit();
+
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -123,6 +149,15 @@ public class SecondFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Применяем адаптер к элементу spinner
         binding.activityCategory.setAdapter(adapter);
+        if(receivedItem != -1){
+            Item item = items.get(receivedItem);
+            //binding.activityImage.setImageURI(Uri.parse(receivedItem.getPhoto()));
+            binding.activityCategory.setSelection(ct.indexOf(item.getActivityCategory().getValue()));
+            binding.activityDuration.setText(Integer.toString(item.getDurationInMinutes()));
+            binding.activityName.setText(item.getActivityName());
+            binding.activityDescription.setText(item.getActivityDescription());
+        }
+
 
     }
 
@@ -150,11 +185,10 @@ public class SecondFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 if (requestCode == 1) {
                     Uri selectedImageUri = data.getData();
-                    String str = getRealPathFromURI(selectedImageUri);
                     // Get the path from the Uri
                     // Set the image in ImageView
                     binding.activityImage.setImageURI(selectedImageUri);
-                    saveToFiles();
+                    imgPath = selectedImageUri.toString();
 
                 }
             }
@@ -162,55 +196,6 @@ public class SecondFragment extends Fragment {
             Log.e("FileSelectorActivity", "File select error", e);
         }
     }
-    @SuppressLint("Range")
-    public String getRealPathFromURI(Uri contentUri) {
-// can post image
-        String res = null;
-        if (contentUri.getScheme().equals("content")) {
-            Cursor cursor = getContext().getContentResolver().query(contentUri, null, null, null, null);
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    res = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                }
-            } finally {
-                cursor.close();
-            }
-            if (res == null) {
-                res = contentUri.getPath();
-                int cutt = res.lastIndexOf('/');
-                if (cutt != -1) {
-                    res = res.substring(cutt + 1);
-                }
-            }
-        }
-        return res;
 
-    }
-
-    public void saveToFiles(){
-        // Write to SD Card
-        try {
-            BitmapDrawable drawable = (BitmapDrawable) binding.activityImage.getDrawable();
-            Bitmap bitmap = drawable.getBitmap();
-            File sdCard = Environment.getExternalStorageDirectory();
-            File dir = new File(sdCard.getAbsolutePath() + "/camtest");
-            dir.mkdirs();
-
-            String fileName = String.format("%d.jpg", System.currentTimeMillis());
-            File outFile = new File(dir, fileName);
-
-            outStream = new FileOutputStream(outFile);
-            boolean d = bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outStream);
-            outStream.flush();
-            outStream.close();
-            newActivity.setPhoto(outFile.getAbsolutePath());
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-
-        }
-    }
 
 }

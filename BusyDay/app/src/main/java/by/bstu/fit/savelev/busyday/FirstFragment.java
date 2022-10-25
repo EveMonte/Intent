@@ -1,6 +1,7 @@
 package by.bstu.fit.savelev.busyday;
 
 import static by.bstu.fit.savelev.busyday.utils.JsonUtil.DeserializeDataFromJson;
+import static by.bstu.fit.savelev.busyday.utils.JsonUtil.SerializeDataToJson;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,6 +31,9 @@ public class FirstFragment extends Fragment {
 
     private FragmentFirstBinding binding;
     private ArrayList<Item> activities;
+    private DialogF dlg;
+    private int index;
+
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -37,19 +41,21 @@ public class FirstFragment extends Fragment {
     ) {
 
         binding = FragmentFirstBinding.inflate(inflater, container, false);
-        if(DeserializeDataFromJson(getContext())){
             activities = ((Storage) getContext().getApplicationContext()).getItems();
+        dlg = new DialogF();
 
-        }
-        else
-            activities = new ArrayList<>();
-        fillListView();
+        fillListView(activities);
         registerForContextMenu(binding.booksList);
         binding.addItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavHostFragment.findNavController(FirstFragment.this)
-                        .navigate(R.id.action_FirstFragment_to_SecondFragment);
+                SecondFragment fragment = new SecondFragment();
+
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.nav_host_fragment_content_main, fragment)
+                        .addToBackStack(null)
+                        .commit();
             }
 
         });
@@ -87,26 +93,45 @@ public class FirstFragment extends Fragment {
     private void editItem(int position) {
         SecondFragment fragment = new SecondFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable("CurrentItem", activities.get(position));  // Key, value
+        bundle.putInt("CurrentItem", position);  // Key, value
         fragment.setArguments(bundle);
 
-        getFragmentManager()
+        getActivity().getSupportFragmentManager()
                 .beginTransaction()
-                //.replace(R.id.container, fragment)
+                .replace(R.id.nav_host_fragment_content_main, fragment)
+                .addToBackStack(null)
                 .commit();
 //        NavHostFragment.findNavController(FirstFragment.this)
 //                .navigate(R.id.action_FirstFragment_to_SecondFragment);
 
     }
     private void deleteItem(int position) {
+        dlg.show(getActivity().getSupportFragmentManager(),"dlg");
+        index = position;
+    }
+    public void delete(){
+        activities.remove(index);
+        fillListView(activities);
+        SerializeDataToJson(getContext());
     }
 
     private void viewItem(int position) {
+        ViewInfo fragment = new ViewInfo();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("CurrentItem", activities.get(position));  // Key, value
+        fragment.setArguments(bundle);
+
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.nav_host_fragment_content_main, fragment)
+                .addToBackStack(null)
+                .commit();
 
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
     }
 
     @Override
@@ -115,7 +140,7 @@ public class FirstFragment extends Fragment {
         binding = null;
     }
 
-    private void fillListView() {
+    public void fillListView(ArrayList<Item> activities) {
         ArrayList<HashMap<String, String>> arrayList = new ArrayList<>();
         HashMap<String, String> map;
 
@@ -135,8 +160,7 @@ public class FirstFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View itemClicked, int position,
                                     long id) {
-//                switchActivityIntent.putExtra("Book", activities.get(position));
-//                startActivity(switchActivityIntent);
+                viewItem(position);
 
             }
         });

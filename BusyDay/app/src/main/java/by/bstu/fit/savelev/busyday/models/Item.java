@@ -10,6 +10,29 @@ public class Item implements Parcelable {
     private int durationInMinutes;
     private String photo;
 
+    public Item(Parcel in) {
+        activityName = in.readString();
+        activityDescription = in.readString();
+        durationInMinutes = in.readInt();
+        photo = in.readString();
+    }
+
+    public static final Creator<Item> CREATOR = new Creator<Item>() {
+        @Override
+        public Item createFromParcel(Parcel in) {
+            return new Item(in);
+        }
+
+        @Override
+        public Item[] newArray(int size) {
+            return new Item[size];
+        }
+    };
+
+    public Item() {
+
+    }
+
     public String getActivityName() {
         return activityName;
     }
@@ -31,7 +54,15 @@ public class Item implements Parcelable {
     }
 
     public void setActivityCategory(String activityCategory) {
-        this.activityCategory = ActivityCategories.valueOf(activityCategory);
+        for (ActivityCategories cat:
+                ActivityCategories.values()
+        ) {
+            if(cat.getValue().equals(activityCategory)) {
+                this.activityCategory = cat;
+                break;
+            }
+        }
+
     }
 
     public int getDurationInMinutes() {
@@ -57,6 +88,9 @@ public class Item implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-
+        parcel.writeString(activityName);
+        parcel.writeString(activityDescription);
+        parcel.writeInt(durationInMinutes);
+        parcel.writeString(photo);
     }
 }
