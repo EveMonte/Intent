@@ -2,6 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="by.bstu.fit.savelev.busyday.MainActivity">
+    <item android:id="@+id/search"
+        android:title="Поиск"
+        android:icon="@drawable/ic_search"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="android.widget.SearchView" />
+
     <item
         android:id="@+id/action_order"
         android:orderInCategory="100"

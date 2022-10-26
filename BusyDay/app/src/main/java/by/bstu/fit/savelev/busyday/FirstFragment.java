@@ -33,6 +33,7 @@ public class FirstFragment extends Fragment {
     private ArrayList<Item> activities;
     private DialogF dlg;
     private int index;
+    public SimpleAdapter adapter;
 
     @Override
     public View onCreateView(
@@ -63,6 +64,7 @@ public class FirstFragment extends Fragment {
         return binding.getRoot();
 
     }
+
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -140,7 +142,7 @@ public class FirstFragment extends Fragment {
         binding = null;
     }
 
-    public void fillListView(ArrayList<Item> activities) {
+    public SimpleAdapter fillListView(ArrayList<Item> activities) {
         ArrayList<HashMap<String, String>> arrayList = new ArrayList<>();
         HashMap<String, String> map;
 
@@ -151,7 +153,7 @@ public class FirstFragment extends Fragment {
             arrayList.add(map);
 
         }
-        SimpleAdapter adapter = new SimpleAdapter(getContext(), arrayList, android.R.layout.simple_list_item_2,
+        adapter = new SimpleAdapter(getContext(), arrayList, android.R.layout.simple_list_item_2,
                 new String[]{"Name", "Category"},
                 new int[]{android.R.id.text1, android.R.id.text2});
         binding.booksList.setAdapter(adapter);
@@ -164,7 +166,7 @@ public class FirstFragment extends Fragment {
 
             }
         });
-
+        return adapter;
     }
 
 

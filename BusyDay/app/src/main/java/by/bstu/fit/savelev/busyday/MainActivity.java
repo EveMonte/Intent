@@ -2,6 +2,8 @@ package by.bstu.fit.savelev.busyday;
 
 import static by.bstu.fit.savelev.busyday.utils.JsonUtil.DeserializeDataFromJson;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -27,6 +29,7 @@ import by.bstu.fit.savelev.busyday.models.Storage;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.SearchView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,6 +62,34 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        // Associate searchable configuration with the SearchView
+
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setQueryHint("Введите название");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+
+                FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+                List<Fragment> fragments = fragmentManager.getFragments();
+                if(fragments != null){
+                    for(Fragment fragment : fragments){
+                        if(fragment != null && fragment.isVisible())
+                            if(fragment instanceof FirstFragment){
+                                ((FirstFragment)fragment).adapter.getFilter().filter(s);
+                            }
+                    }
+                }
+
+                return false;
+            }
+        });
         return true;
     }
 
