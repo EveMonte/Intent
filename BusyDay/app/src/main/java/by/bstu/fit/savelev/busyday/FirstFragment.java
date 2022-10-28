@@ -52,11 +52,21 @@ public class FirstFragment extends Fragment {
             public void onClick(View view) {
                 SecondFragment fragment = new SecondFragment();
 
-                getActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.nav_host_fragment_content_main, fragment)
-                        .addToBackStack(null)
-                        .commit();
+                if (Orientation.isHorizontalOrientation(getActivity())) {
+                    getActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.second_fragment_content_main, fragment)
+                            .addToBackStack(null)
+                            .commit();
+
+                } else {
+                    getActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.nav_host_fragment_content_main, fragment)
+                            .addToBackStack(null)
+                            .commit();
+
+                }
             }
 
         });
@@ -98,11 +108,21 @@ public class FirstFragment extends Fragment {
         bundle.putInt("CurrentItem", position);  // Key, value
         fragment.setArguments(bundle);
 
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.nav_host_fragment_content_main, fragment)
-                .addToBackStack(null)
-                .commit();
+        if (Orientation.isHorizontalOrientation(getActivity())) {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.second_fragment_content_main, fragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        } else {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.nav_host_fragment_content_main, fragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        }
 //        NavHostFragment.findNavController(FirstFragment.this)
 //                .navigate(R.id.action_FirstFragment_to_SecondFragment);
 
@@ -123,11 +143,21 @@ public class FirstFragment extends Fragment {
         bundle.putParcelable("CurrentItem", activities.get(position));  // Key, value
         fragment.setArguments(bundle);
 
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.nav_host_fragment_content_main, fragment)
-                .addToBackStack(null)
-                .commit();
+        if (Orientation.isHorizontalOrientation(getActivity())) {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.second_fragment_content_main, fragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        } else {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.nav_host_fragment_content_main, fragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        }
 
     }
 

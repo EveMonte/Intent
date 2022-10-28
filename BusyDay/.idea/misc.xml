@@ -5,6 +5,7 @@
       <map>
         <entry key="..\:/Android/BusyDay/app/src/main/res/drawable/ic_search.xml" value="0.1995" />
         <entry key="..\:/Android/BusyDay/app/src/main/res/drawable/ic_search_background.xml" value="0.1995" />
+        <entry key="..\:/Android/BusyDay/app/src/main/res/layout-land/content_main.xml" value="0.1" />
         <entry key="..\:/Android/BusyDay/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Android/BusyDay/app/src/main/res/layout/content_main.xml" value="0.1" />
         <entry key="..\:/Android/BusyDay/app/src/main/res/layout/fragment_calculated_data.xml" value="0.25" />

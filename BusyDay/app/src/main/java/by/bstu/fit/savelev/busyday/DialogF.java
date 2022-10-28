@@ -20,8 +20,7 @@ public class DialogF extends DialogFragment implements DialogInterface.OnClickLi
         AlertDialog.Builder adb = new AlertDialog.Builder(getActivity())
                 .setTitle("Удалить элемент?")
                 .setPositiveButton(R.string.yes, this)
-                .setNegativeButton(R.string.no, this)
-                .setMessage(R.string.remove);
+                .setNegativeButton(R.string.no, this);
         return adb.create();
     }
 

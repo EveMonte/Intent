@@ -25,23 +25,23 @@ public class ViewInfo extends Fragment {
             Bundle savedInstanceState
     ) {
         Bundle bundle = this.getArguments();
+        binding = FragmentViewInfoBinding.inflate(inflater, container, false);
 
         if (bundle != null) {
             receivedItem = bundle.getParcelable("CurrentItem"); // Key
+            binding.activityCategory.setText(receivedItem.getActivityCategory().getValue());
+            binding.activityDuration.setText(Integer.toString(receivedItem.getDurationInMinutes()));
+            binding.activityName.setText(receivedItem.getActivityName());
+            binding.activityDescription.setText(receivedItem.getActivityDescription());
+            try {
+                //binding.activityImage.setImageURI(Uri.parse(receivedItem.getPhoto()));
+            }
+            catch (Exception ex){
+
+            }
 
         }
 
-        binding = FragmentViewInfoBinding.inflate(inflater, container, false);
-        try {
-            //binding.activityImage.setImageURI(Uri.parse(receivedItem.getPhoto()));
-        }
-        catch (SecurityException ex){
-
-        }
-        binding.activityCategory.setText(receivedItem.getActivityCategory().getValue());
-        binding.activityDuration.setText(Integer.toString(receivedItem.getDurationInMinutes()));
-        binding.activityName.setText(receivedItem.getActivityName());
-        binding.activityDescription.setText(receivedItem.getActivityDescription());
 
         return binding.getRoot();
     }

@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import by.bstu.fit.savelev.busyday.databinding.FragmentSecondBinding;
+import by.bstu.fit.savelev.busyday.utils.Orientation;
 
 public class SecondFragment extends Fragment {
 
@@ -122,11 +123,14 @@ public class SecondFragment extends Fragment {
         ((Storage) getContext().getApplicationContext()).setItems(items);
         SerializeDataToJson(getContext());
         FirstFragment fragment = new FirstFragment();
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.nav_host_fragment_content_main, fragment)
-                .addToBackStack(null)
-                .commit();
+        if (!Orientation.isHorizontalOrientation(getActivity())) {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.nav_host_fragment_content_main, fragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        }
 
     }
 
@@ -151,7 +155,7 @@ public class SecondFragment extends Fragment {
         binding.activityCategory.setAdapter(adapter);
         if(receivedItem != -1){
             Item item = items.get(receivedItem);
-            //binding.activityImage.setImageURI(Uri.parse(receivedItem.getPhoto()));
+            binding.activityImage.setImageURI(Uri.parse(item.getPhoto()));
             binding.activityCategory.setSelection(ct.indexOf(item.getActivityCategory().getValue()));
             binding.activityDuration.setText(Integer.toString(item.getDurationInMinutes()));
             binding.activityName.setText(item.getActivityName());

@@ -26,6 +26,7 @@ import by.bstu.fit.savelev.busyday.databinding.ActivityMainBinding;
 import by.bstu.fit.savelev.busyday.models.ActivityCategories;
 import by.bstu.fit.savelev.busyday.models.Item;
 import by.bstu.fit.savelev.busyday.models.Storage;
+import by.bstu.fit.savelev.busyday.utils.Orientation;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -127,13 +128,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void countByCategories(){
+    private void countByCategories() {
         CalculatedData fragment = new CalculatedData();
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.nav_host_fragment_content_main, fragment)
-                .addToBackStack(null)
-                .commit();
+
+        if (Orientation.isHorizontalOrientation(this)) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.second_fragment_content_main, fragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        } else {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.nav_host_fragment_content_main, fragment)
+                    .addToBackStack(null)
+                    .commit();
+
+        }
 
     }
 
