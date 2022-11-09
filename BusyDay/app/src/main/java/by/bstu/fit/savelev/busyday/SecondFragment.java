@@ -5,6 +5,7 @@ import static android.app.Activity.RESULT_OK;
 import static by.bstu.fit.savelev.busyday.utils.JsonUtil.SerializeDataToJson;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import by.bstu.fit.savelev.busyday.databinding.FragmentSecondBinding;
+import by.bstu.fit.savelev.busyday.utils.DbHelper;
 import by.bstu.fit.savelev.busyday.utils.Orientation;
 
 public class SecondFragment extends Fragment {
@@ -108,20 +110,37 @@ public class SecondFragment extends Fragment {
     public void saveItem(){
 
         Item item = new Item();
+        item.setId(items.get(receivedItem).getId());
         item.setActivityDescription(binding.activityDescription.getText().toString());
         item.setActivityCategory((String)binding.activityCategory.getSelectedItem());
         item.setPhoto(imgPath);
         item.setDurationInMinutes(Integer.parseInt(binding.activityDuration.getText().toString()));
         item.setActivityName(binding.activityName.getText().toString());
 
+        ContentValues values = new ContentValues();
+        values.put(DBContract.DBEntry.COLUMN_NAME_NAME, item.getActivityName());
+        values.put(DBContract.DBEntry.COLUMN_NAME_DESCRIPTION, item.getActivityDescription());
+        values.put(DBContract.DBEntry.COLUMN_NAME_DURATION, item.getDurationInMinutes());
+        values.put(DBContract.DBEntry.COLUMN_NAME_IMAGE, item.getPhoto());
+        values.put(DBContract.DBEntry.COLUMN_NAME_CATEGORY, item.getActivityCategory().getValue());
 
-        if(receivedItem != -1){
+        if(receivedItem >= 0){
+// Столбец, коорый надо обновлять
+            String selection = DBContract.DBEntry._ID + " = ?";
+            String[] selectionArgs = { Long.toString(item.getId()) };
+            Storage.repository.Update(values, selection, selectionArgs);
             items.set(receivedItem, item);
-        }
-        else items.add(item);
 
-        ((Storage) getContext().getApplicationContext()).setItems(items);
-        SerializeDataToJson(getContext());
+            ((Storage)getContext().getApplicationContext()).setItems(items);
+        }
+        else {
+            items.add(item);
+
+            Storage.repository.Add(values);
+        }
+
+
+
         FirstFragment fragment = new FirstFragment();
         if (!Orientation.isHorizontalOrientation(getActivity())) {
             getActivity().getSupportFragmentManager()
@@ -155,7 +174,7 @@ public class SecondFragment extends Fragment {
         binding.activityCategory.setAdapter(adapter);
         if(receivedItem != -1){
             Item item = items.get(receivedItem);
-            binding.activityImage.setImageURI(Uri.parse(item.getPhoto()));
+            //binding.activityImage.setImageURI(Uri.parse(item.getPhoto()));
             binding.activityCategory.setSelection(ct.indexOf(item.getActivityCategory().getValue()));
             binding.activityDuration.setText(Integer.toString(item.getDurationInMinutes()));
             binding.activityName.setText(item.getActivityName());

@@ -4,15 +4,21 @@ import static by.bstu.fit.savelev.busyday.utils.JsonUtil.DeserializeDataFromJson
 import static by.bstu.fit.savelev.busyday.utils.JsonUtil.SerializeDataToJson;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.provider.BaseColumns;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CursorAdapter;
 import android.widget.SimpleAdapter;
+import android.widget.SimpleCursorAdapter;
 
+import by.bstu.fit.savelev.busyday.models.DBContract;
 import by.bstu.fit.savelev.busyday.models.Item;
 import by.bstu.fit.savelev.busyday.models.Storage;
 import by.bstu.fit.savelev.busyday.utils.*;
@@ -42,7 +48,7 @@ public class FirstFragment extends Fragment {
     ) {
 
         binding = FragmentFirstBinding.inflate(inflater, container, false);
-            activities = ((Storage) getContext().getApplicationContext()).getItems();
+        activities = ((Storage) getContext().getApplicationContext()).getItems();
         dlg = new DialogF();
 
         fillListView(activities);
@@ -123,8 +129,6 @@ public class FirstFragment extends Fragment {
                     .commit();
 
         }
-//        NavHostFragment.findNavController(FirstFragment.this)
-//                .navigate(R.id.action_FirstFragment_to_SecondFragment);
 
     }
     private void deleteItem(int position) {
@@ -132,15 +136,21 @@ public class FirstFragment extends Fragment {
         index = position;
     }
     public void delete(){
+
+        // Определение 'where' части запроса
+        String selection = DBContract.DBEntry._ID + " = ?";
+        // Определение аргументов в placeholder
+        String[] selectionArgs = { Long.toString(activities.get(index).getId()) };
+        // SQL statement.
+        Storage.repository.Delete(selection, selectionArgs);
         activities.remove(index);
         fillListView(activities);
-        SerializeDataToJson(getContext());
     }
 
     private void viewItem(int position) {
         ViewInfo fragment = new ViewInfo();
         Bundle bundle = new Bundle();
-        bundle.putParcelable("CurrentItem", activities.get(position));  // Key, value
+        bundle.putParcelable("CurrentItem", (Parcelable) activities.get(position));  // Key, value
         fragment.setArguments(bundle);
 
         if (Orientation.isHorizontalOrientation(getActivity())) {
@@ -173,21 +183,18 @@ public class FirstFragment extends Fragment {
     }
 
     public SimpleAdapter fillListView(ArrayList<Item> activities) {
-        ArrayList<HashMap<String, String>> arrayList = new ArrayList<>();
-        HashMap<String, String> map;
-
-        for(int i = 0; i < activities.size(); i++){
-            map = new HashMap<>();
-            map.put("Name", activities.get(i).getActivityName());
-            map.put("Category", activities.get(i).getActivityCategory().getValue());
-            arrayList.add(map);
-
-        }
-        adapter = new SimpleAdapter(getContext(), arrayList, android.R.layout.simple_list_item_2,
-                new String[]{"Name", "Category"},
-                new int[]{android.R.id.text1, android.R.id.text2});
-        binding.booksList.setAdapter(adapter);
-
+        String[] projection = {
+                BaseColumns._ID,
+                DBContract.DBEntry.COLUMN_NAME_NAME,
+                DBContract.DBEntry.COLUMN_NAME_CATEGORY,
+        };
+        CursorAdapter listAdapter = new SimpleCursorAdapter(getContext(),
+                android.R.layout.simple_list_item_1,
+                Storage.repository.GetCursor(projection, null, null, null, null,null),
+                new String[]{DBContract.DBEntry.COLUMN_NAME_NAME},
+        new int[]{android.R.id.text1},
+                0);
+        binding.booksList.setAdapter(listAdapter);
         binding.booksList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View itemClicked, int position,

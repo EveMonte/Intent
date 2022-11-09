@@ -19,6 +19,7 @@ public class ViewInfo extends Fragment {
 
     private FragmentViewInfoBinding binding;
     private Item receivedItem;
+    private  long index;
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,

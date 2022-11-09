@@ -1,14 +1,24 @@
 package by.bstu.fit.savelev.busyday.models;
 
 import android.app.Application;
+import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import by.bstu.fit.savelev.busyday.utils.DbHelper;
+
 public class Storage extends Application {
     ArrayList<Item> activities;
+    public static Repository repository;
+//    public Storage() {
+//        mDbHelper = new DbHelper(this);
+//        dbHelperWritableDatabase = mDbHelper.getWritableDatabase();
+//        dbHelperReadableDatabase = mDbHelper.getReadableDatabase();
+//
+//    }
 
     public ArrayList<Item> getItems() {
         return activities;

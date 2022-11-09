@@ -4,6 +4,7 @@ import static by.bstu.fit.savelev.busyday.utils.JsonUtil.DeserializeDataFromJson
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -11,6 +12,7 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Parcelable;
+import android.provider.BaseColumns;
 import android.view.View;
 
 import androidx.fragment.app.Fragment;
@@ -24,8 +26,11 @@ import androidx.navigation.ui.NavigationUI;
 
 import by.bstu.fit.savelev.busyday.databinding.ActivityMainBinding;
 import by.bstu.fit.savelev.busyday.models.ActivityCategories;
+import by.bstu.fit.savelev.busyday.models.DBContract;
 import by.bstu.fit.savelev.busyday.models.Item;
+import by.bstu.fit.savelev.busyday.models.Repository;
 import by.bstu.fit.savelev.busyday.models.Storage;
+import by.bstu.fit.savelev.busyday.utils.DbHelper;
 import by.bstu.fit.savelev.busyday.utils.Orientation;
 
 import android.view.Menu;
@@ -40,19 +45,16 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
-    private ArrayList<Item> activities;
+    private ArrayList activities;
     public ArrayList<HashMap<String, String>> hashMap;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(DeserializeDataFromJson(this)){
-            activities = ((Storage) this.getApplicationContext()).getItems();
+        Storage.repository = new Repository(this);
+        activities = Storage.repository.GetDirectoryList(null, null, null, null, null);
 
-        }
-        else
-            activities = new ArrayList<>();
+        ((Storage) this.getApplicationContext()).setItems(activities);
 
-        activities = ((Storage) this.getApplicationContext()).getItems();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -64,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         // Associate searchable configuration with the SearchView
-
         SearchView searchView =
                 (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setQueryHint("Введите название");

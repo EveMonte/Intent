@@ -3,7 +3,9 @@ package by.bstu.fit.savelev.busyday.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Item implements Parcelable {
+public class Item implements Parcelable
+{
+    private long id;
     private String activityName;
     private String activityDescription;
     private ActivityCategories activityCategory;
@@ -31,6 +33,30 @@ public class Item implements Parcelable {
 
     public Item() {
 
+    }
+
+    public Item(long id, String activityName, String activityDescription, String activityCategory, int durationInMinutes, String photo) {
+        this.id = id;
+        this.activityName = activityName;
+        this.activityDescription = activityDescription;
+        for (ActivityCategories cat:
+                ActivityCategories.values()
+        ) {
+            if(cat.getValue().equals(activityCategory)) {
+                this.activityCategory = cat;
+                break;
+            }
+        }
+        this.durationInMinutes = durationInMinutes;
+        this.photo = photo;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getActivityName() {
@@ -88,6 +114,7 @@ public class Item implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(id);
         parcel.writeString(activityName);
         parcel.writeString(activityDescription);
         parcel.writeInt(durationInMinutes);
