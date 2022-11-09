@@ -35,10 +35,10 @@ public class Repository implements IRepository{
 
     }
 
-    @Override
     public ArrayList<Item> GetDirectoryList(String selection, String [] selectionArgs, String groupBy, String having, String orderBy) {
         return GetDirectoryList(projection, selection, selectionArgs, groupBy, having, orderBy);
     }
+    @Override
     public ArrayList<Item> GetDirectoryList(String[] projection, String selection, String [] selectionArgs, String groupBy, String having, String orderBy) {
         // определяем названия столбцов
         // которые нужны для выполнения запроса
@@ -74,6 +74,7 @@ public class Repository implements IRepository{
 
     }
 
+    @Override
     public Cursor GetCursor(String[] projection, String selection, String [] selectionArgs, String groupBy, String having, String orderBy){
         return dbHelperWritableDatabase.query(
                 DBContract.DBEntry.TABLE_NAME, // имя таблицы
