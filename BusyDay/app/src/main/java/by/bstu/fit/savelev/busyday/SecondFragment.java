@@ -110,12 +110,11 @@ public class SecondFragment extends Fragment {
     public void saveItem(){
 
         Item item = new Item();
-        item.setId(items.get(receivedItem).getId());
-        item.setActivityDescription(binding.activityDescription.getText().toString());
+        item.setActivityDescription(binding.activityDescriptionEdit.getText().toString());
         item.setActivityCategory((String)binding.activityCategory.getSelectedItem());
         item.setPhoto(imgPath);
-        item.setDurationInMinutes(Integer.parseInt(binding.activityDuration.getText().toString()));
-        item.setActivityName(binding.activityName.getText().toString());
+        item.setDurationInMinutes(Integer.parseInt(binding.activityDurationEdit.getText().toString()));
+        item.setActivityName(binding.activityNameEdit.getText().toString());
 
         ContentValues values = new ContentValues();
         values.put(DBContract.DBEntry.COLUMN_NAME_NAME, item.getActivityName());
@@ -136,7 +135,7 @@ public class SecondFragment extends Fragment {
         else {
             items.add(item);
 
-            Storage.repository.Add(values);
+            item.setId(Storage.repository.Add(values));
         }
 
 
@@ -174,11 +173,11 @@ public class SecondFragment extends Fragment {
         binding.activityCategory.setAdapter(adapter);
         if(receivedItem != -1){
             Item item = items.get(receivedItem);
-            //binding.activityImage.setImageURI(Uri.parse(item.getPhoto()));
+            binding.activityImage.setImageURI(Uri.parse(item.getPhoto()));
             binding.activityCategory.setSelection(ct.indexOf(item.getActivityCategory().getValue()));
-            binding.activityDuration.setText(Integer.toString(item.getDurationInMinutes()));
-            binding.activityName.setText(item.getActivityName());
-            binding.activityDescription.setText(item.getActivityDescription());
+            binding.activityDurationEdit.setText(Integer.toString(item.getDurationInMinutes()));
+            binding.activityNameEdit.setText(item.getActivityName());
+            binding.activityDescriptionEdit.setText(item.getActivityDescription());
         }
 
 

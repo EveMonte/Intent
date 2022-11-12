@@ -7,14 +7,20 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Parcelable;
 import android.provider.BaseColumns;
 import android.view.View;
 
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -46,19 +52,67 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private ArrayList activities;
+    public DrawerLayout drawerLayout;
+    public ActionBarDrawerToggle actionBarDrawerToggle;
     public ArrayList<HashMap<String, String>> hashMap;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Storage.repository = new Repository(this);
         activities = Storage.repository.GetDirectoryList(null, null, null, null, null);
-
-        ((Storage) this.getApplicationContext()).setItems(activities);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setSupportActionBar(binding.toolbar);
+        drawerLayout = binding.myDrawerLayout;
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
+
+        // pass the Open and Close toggle for the drawer layout listener
+        // to toggle the button
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+binding.navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        switch(id){
+            case R.id.action_order:
+                sortItems();
+                binding.myDrawerLayout.closeDrawer(GravityCompat.START);
+
+                break;
+            case R.id.action_count:
+                countByCategories();
+                binding.myDrawerLayout.closeDrawer(GravityCompat.START);
+
+                break;
+            case R.id.switch_view:
+                FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+                List<Fragment> fragments = fragmentManager.getFragments();
+                if(fragments != null){
+                    for(Fragment fragment : fragments) {
+                        if (fragment != null && fragment.isVisible())
+                            if (fragment instanceof FirstFragment) {
+                                ((FirstFragment) fragment).SwitchView();
+                            }
+                    }
+                }
+                binding.myDrawerLayout.closeDrawer(GravityCompat.START);
+
+        }
+        return true;
+    }
+});
+        // to make the Navigation drawer icon always appear on the action bar
+        ((Storage) this.getApplicationContext()).setItems(activities);
+
+
+//        setSupportActionBar(binding.toolbar);
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.setHomeAsUpIndicator(R.drawable.ic_drawer);
+        //binding.myDrawerLayout.closeDrawer(GravityCompat.START);
     }
 
     @Override
@@ -66,32 +120,32 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         // Associate searchable configuration with the SearchView
-        SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setQueryHint("Введите название");
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-
-                FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
-                List<Fragment> fragments = fragmentManager.getFragments();
-                if(fragments != null){
-                    for(Fragment fragment : fragments){
-                        if(fragment != null && fragment.isVisible())
-                            if(fragment instanceof FirstFragment){
-                                ((FirstFragment)fragment).adapter.getFilter().filter(s);
-                            }
-                    }
-                }
-
-                return false;
-            }
-        });
+//        SearchView searchView =
+//                (SearchView) menu.findItem(R.id.search).getActionView();
+//        searchView.setQueryHint("Введите название");
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String s) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String s) {
+//
+//                FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+//                List<Fragment> fragments = fragmentManager.getFragments();
+//                if(fragments != null){
+//                    for(Fragment fragment : fragments){
+//                        if(fragment != null && fragment.isVisible())
+//                            if(fragment instanceof FirstFragment){
+//                                ((FirstFragment)fragment).adapter.getFilter().filter(s);
+//                            }
+//                    }
+//                }
+//
+//                return false;
+//            }
+//        });
         return true;
     }
 
@@ -106,10 +160,32 @@ public class MainActivity extends AppCompatActivity {
         switch(id){
             case R.id.action_order:
                 sortItems();
+                binding.myDrawerLayout.closeDrawer(GravityCompat.END);
+
                 break;
             case R.id.action_count:
                 countByCategories();
+                binding.myDrawerLayout.closeDrawer(GravityCompat.END);
                 break;
+            case R.id.switch_view:
+                FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+                List<Fragment> fragments = fragmentManager.getFragments();
+                if(fragments != null){
+                    for(Fragment fragment : fragments) {
+                        if (fragment != null && fragment.isVisible())
+                            if (fragment instanceof FirstFragment) {
+                                ((FirstFragment) fragment).SwitchView();
+                            }
+                    }
+                }
+                binding.myDrawerLayout.closeDrawer(GravityCompat.END);
+
+                break;
+        }
+        if(binding.myDrawerLayout.isDrawerOpen(GravityCompat.START)){
+            binding.myDrawerLayout.closeDrawer(GravityCompat.END);
+        }else {
+            binding.myDrawerLayout.openDrawer(GravityCompat.START);
         }
 
         return super.onOptionsItemSelected(item);
@@ -150,10 +226,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
-    }
+//    @Override
+//    public boolean onSupportNavigateUp() {
+//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+//        return NavigationUI.navigateUp(navController, appBarConfiguration)
+//                || super.onSupportNavigateUp();
+//    }
 }

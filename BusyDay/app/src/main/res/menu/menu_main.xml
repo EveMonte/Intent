@@ -2,11 +2,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="by.bstu.fit.savelev.busyday.MainActivity">
-    <item android:id="@+id/search"
-        android:title="Поиск"
-        android:icon="@drawable/ic_search"
-        app:showAsAction="collapseActionView|ifRoom"
-        app:actionViewClass="android.widget.SearchView" />
+<!--    <item android:id="@+id/search"-->
+<!--        android:title="Поиск"-->
+<!--        app:showAsAction="collapseActionView|ifRoom"-->
+<!--        app:actionViewClass="android.widget.SearchView" />-->
 
     <item
         android:id="@+id/action_order"
@@ -17,5 +16,10 @@
         android:id="@+id/action_count"
         android:orderInCategory="100"
         android:title="Рассчитать"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/switch_view"
+        android:orderInCategory="100"
+        android:title="Сменить отображение"
         app:showAsAction="never" />
 </menu>

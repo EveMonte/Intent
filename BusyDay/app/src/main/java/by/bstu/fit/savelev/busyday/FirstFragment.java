@@ -1,22 +1,13 @@
 package by.bstu.fit.savelev.busyday;
 
-import static by.bstu.fit.savelev.busyday.utils.JsonUtil.DeserializeDataFromJson;
-import static by.bstu.fit.savelev.busyday.utils.JsonUtil.SerializeDataToJson;
-
-import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.provider.BaseColumns;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.CursorAdapter;
 import android.widget.SimpleAdapter;
-import android.widget.SimpleCursorAdapter;
 
 import by.bstu.fit.savelev.busyday.models.DBContract;
 import by.bstu.fit.savelev.busyday.models.Item;
@@ -25,11 +16,11 @@ import by.bstu.fit.savelev.busyday.utils.*;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import by.bstu.fit.savelev.busyday.databinding.FragmentFirstBinding;
 
@@ -39,8 +30,9 @@ public class FirstFragment extends Fragment {
     private ArrayList<Item> activities;
     private DialogF dlg;
     private int index;
-    public SimpleAdapter adapter;
-
+    ActivitiesAdapter mAdapter;
+    SimpleAdapter adapter;
+    RecyclerView rvActivities;
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -53,6 +45,15 @@ public class FirstFragment extends Fragment {
 
         fillListView(activities);
         registerForContextMenu(binding.booksList);
+        rvActivities = binding.booksList;
+
+        // Initialize contacts
+        // Create adapter passing in the sample user data
+        mAdapter = new ActivitiesAdapter(activities);
+        // Attach the adapter to the recyclerview to populate items
+        rvActivities.setAdapter(mAdapter);
+        // Set layout manager to position the items
+        rvActivities.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.addItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,22 +93,34 @@ public class FirstFragment extends Fragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int position = -1;
+        try {
+            position = ((ActivitiesAdapter)binding.booksList.getAdapter()).getPosition();
+        } catch (Exception e) {
+            return super.onContextItemSelected(item);
+        }
+//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.view:
-                viewItem(info.position);
+                viewItem(position);
                 return true;
             case R.id.edit:
-                editItem(info.position); // метод, выполняющий действие при редактировании пункта меню
+                editItem(position); // метод, выполняющий действие при редактировании пункта меню
                 return true;
             case R.id.delete:
-                deleteItem(info.position); //метод, выполняющий действие при удалении пункта меню
+                deleteItem(position); //метод, выполняющий действие при удалении пункта меню
                 return true;
             default:
                 return super.onContextItemSelected(item);
         }
     }
+public void SwitchView(){
+    getActivity().supportInvalidateOptionsMenu();
+    boolean isSwitched = mAdapter.toggleItemViewType();
+    rvActivities.setLayoutManager(isSwitched ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+    mAdapter.notifyDataSetChanged();
 
+}
     private void editItem(int position) {
         SecondFragment fragment = new SecondFragment();
         Bundle bundle = new Bundle();
@@ -144,7 +157,8 @@ public class FirstFragment extends Fragment {
         // SQL statement.
         Storage.repository.Delete(selection, selectionArgs);
         activities.remove(index);
-        fillListView(activities);
+        ((ActivitiesAdapter)binding.booksList.getAdapter()).notifyDataSetChanged();
+        //fillListView(activities);
     }
 
     private void viewItem(int position) {
@@ -183,26 +197,39 @@ public class FirstFragment extends Fragment {
     }
 
     public SimpleAdapter fillListView(ArrayList<Item> activities) {
-        String[] projection = {
-                BaseColumns._ID,
-                DBContract.DBEntry.COLUMN_NAME_NAME,
-                DBContract.DBEntry.COLUMN_NAME_CATEGORY,
-        };
-        CursorAdapter listAdapter = new SimpleCursorAdapter(getContext(),
-                android.R.layout.simple_list_item_1,
-                Storage.repository.GetCursor(projection, null, null, null, null,null),
-                new String[]{DBContract.DBEntry.COLUMN_NAME_NAME},
-        new int[]{android.R.id.text1},
-                0);
-        binding.booksList.setAdapter(listAdapter);
-        binding.booksList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View itemClicked, int position,
-                                    long id) {
-                viewItem(position);
+//        String[] projection = {
+//                BaseColumns._ID,
+//                DBContract.DBEntry.COLUMN_NAME_NAME,
+//                DBContract.DBEntry.COLUMN_NAME_CATEGORY,
+//        };
+//        CursorAdapter listAdapter = new SimpleCursorAdapter(getContext(),
+//                android.R.layout.simple_list_item_1,
+//                Storage.repository.GetCursor(projection, null, null, null, null,null),
+//                new String[]{DBContract.DBEntry.COLUMN_NAME_NAME},
+//        new int[]{android.R.id.text1},
+//                0);
+//        binding.booksList.setAdapter(listAdapter);
 
-            }
-        });
+//        binding.booksList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View itemClicked, int position,
+//                                    long id) {
+//                viewItem(position);
+//
+//            }
+//        });
+        binding.booksList.addOnItemTouchListener(
+                new RecyclerItemClickListener(getActivity(), binding.booksList,new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        viewItem(position);
+                    }
+
+                    @Override public void onLongItemClick(View view, int position) {
+                        // do whatever
+                    }
+                })
+        );
+
         return adapter;
     }
 

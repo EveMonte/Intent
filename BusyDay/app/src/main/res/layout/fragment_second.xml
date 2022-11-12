@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
+    style="@style/AppTheme"
     android:layout_width="match_parent">
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
@@ -22,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <EditText
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/activity_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,10 +31,16 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="25dp"
-        android:width="250dp"
+        android:minWidth="250dp"
         android:hint="Название"
-        />
-    <EditText
+        >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/activity_name_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/activity_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,11 +49,15 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="25dp"
-        android:width="250dp"
+        android:minWidth="250dp"
         android:hint="Описание"
-        />
-
-    <EditText
+        >
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/activity_description_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/activity_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -55,9 +66,14 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="25dp"
-        android:width="250dp"
+        android:minWidth="250dp"
         android:hint="Продолжительность (минут)"
-        />
+        >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/activity_duration_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
     <Spinner
         android:id="@+id/activity_category"
         android:layout_width="wrap_content"

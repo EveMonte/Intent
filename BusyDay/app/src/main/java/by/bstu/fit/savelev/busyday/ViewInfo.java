@@ -35,7 +35,7 @@ public class ViewInfo extends Fragment {
             binding.activityName.setText(receivedItem.getActivityName());
             binding.activityDescription.setText(receivedItem.getActivityDescription());
             try {
-                //binding.activityImage.setImageURI(Uri.parse(receivedItem.getPhoto()));
+                binding.activityImage.setImageURI(Uri.parse(receivedItem.getPhoto()));
             }
             catch (Exception ex){
 
